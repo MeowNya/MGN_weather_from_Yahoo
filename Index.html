@@ -1,0 +1,63 @@
+<html>
+	<head>
+		<meta content="text/html" charset="UTF-8" http-equiv="Content-Type">
+		<meta name="description" content="Yahoo Weather Forecast using jQuery and JSON">
+		<style>
+			body {
+				width: 400px;
+				height: 600px:
+			}
+			#city {
+				height: 100px;
+				font-size: 180%;
+				text-align: center;
+				margin: 0 auto;
+				background: lightblue;
+			}
+			#weather_info {
+				margin: 0 auto;			
+			}
+			.weath_now {
+				text-align:center;
+				font-size: 190%;
+				
+				
+			}
+		</style>
+	</head>
+	<body onload="my_weather()">
+		<script>
+		  function my_weather(){
+			var req = new XMLHttpRequest();
+			url = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22magnitogorsk%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys';
+			url = 'https://cors-anywhere.herokuapp.com/' + url;
+			req.open('GET', url, true);
+			req.onreadystatechange = function() {
+				if (req.readyState == 4 && req.status == 200) {
+					//console.log(req.responseText);
+					var weath = "";
+					var jsonData = req.responseText;
+					//console.log(jsonData);
+					var data = JSON.parse(jsonData);
+					T_F = parseInt(data.query.results.channel.item.condition.temp);
+					//console.log(T_F);
+					T_C = Math.round(((T_F - 32)/2) + ((T_F - 32)/2)/10);
+					//console.log(T_C);
+					cond_text = data.query.results.channel.item.condition.text;
+					//console.log(cond_text);
+					weath += "<div class='weath_now'>" + T_C +" C° " + cond_text + "</div>";
+					
+					}
+				document.querySelector('#weather_info').innerHTML = weath;
+			}
+			req.send();
+			setTimeout("my_weather()",900000);
+		}
+		</script>
+		<div id="city">Magnitogorsk
+		<div id="weather_info">
+		</div>
+		
+		</div>
+	</body>
+</html>
