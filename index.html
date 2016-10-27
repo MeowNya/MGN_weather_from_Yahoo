@@ -4,81 +4,147 @@
 		<meta name="description" content="Yahoo Weather Forecast using jQuery and JSON">
 		<style>
 		
-			body {
-				width: 280px;
-				height: 420px:
-			}
+		body {
+			width: 240px;
+			height: 360px;
 			
-			#city {
-				height: 420px
-				font-size: 270%;
-				text-align: center;
-				background-color: lightblue;
-				background-image: url('https://github.com/MeowNya/MGN_weather_from_Yahoo/blob/master/P2173863.png?raw=true');
-				background-size: cover;
-			}
-			
-			#weather_info {
+		}
+		.background_on {
+			background-color: blue;
+			background-image: url(P2173863.png);
+			background-repeat: no-repeat;
+            background-size: cover;
+			 -webkit-filter: blur(3px);
+             -moz-filter: blur(3px);
+             -o-filter: blur(3px);
+             -ms-filter: blur(3px);
+             filter: blur(3px);
+
+		}
+		
+		#weather_now {
+			border: 1px solid black;
+			background-color: rgba(250, 235, 215 , 0.9 );
+		}
+		
+		.city {
+			 height: 40px;
+			 font-size: 100%;
+			 font-weight: bold;
+			 background-color: rgba(250, 240, 230, 0.3 );
+			 
+		}
+		
+		.temp {
+                font-size: 270%;
+				font-weight: bolder;
+				text-align: justify;
 				
-				height: 420px;
-				width: 280px;	
+            }
+         .temp_type {
+                font-size: 100%;
+                vertical-align: top;
+				font-weight: bolder;
 				
-			}
-			
-			.weath_now {
-				height: 170px;
-				text-align:center;
-				font-size: 250%;
-				background-color: rgba(250, 235, 215, 0.3); 
-				
-				
-			}
-			
+            }
+
+          #weather_info,
+            .background_on {
+                position: absolute;
+                width: 240px;
+                height: 360px;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                right: 0;
+            }   
+
 		</style>
 	</head>
-	<body onload="my_weather()">
+	<body>
 		<script>
 		
-		  function my_weather(){
-		  
+		  function my_weather() { 
+				var city = "Magnitogorsk";
+                var url = "https://query.yahooapis.com/v1/public/yql?q=select%20item%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D'" + city + "')%20and%20u%3D'c'&format=json&diagnostics=true&callback="
+				
 				var req = new XMLHttpRequest();
-				url = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22magnitogorsk%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys';
 				req.open('GET', url, true);
 				
+				console.log(url);
 				
 				req.onreadystatechange = function() {
 					if (req.readyState == 4 && req.status == 200) {
-					
-						//console.log(req.responseText);
-						var weath = "";
-						var jsonData = req.responseText;
+						console.log(req.responseText);
+						
+						//var jsonData = req.responseText;
 						//console.log(jsonData);
-						var data = JSON.parse(jsonData);
-						T_F = parseInt(data.query.results.channel.item.condition.temp);
+						var data = JSON.parse(req.responseText);
+						//T_F = parseInt(data.query.results.channel.item.condition.temp);
 						//console.log(T_F);
-						T_C = Math.round(((T_F - 32)/2) + ((T_F - 32)/2)/10);
+						//T_C = Math.round(((T_F - 32)/2) + ((T_F - 32)/2)/10);
 						//console.log(T_C);
-						cond_text = data.query.results.channel.item.condition.text;
+						//cond_text = data.query.results.channel.item.condition.text;
 						//console.log(cond_text);
-						weath += "<div class='weath_now'>" + T_C +" C° " + cond_text + "</div>";
+						//weath += "<div class='weath_now'>" + T_C +" C° " + cond_text + "</div>";
+						var condition = data.query.results.channel.item.condition;
+						var weather_temp_C = condition.temp;
+                        //var weather_text = condition.text;
+                        var weather_image = '<img src="http://l.yimg.com/a/i/us/we/52/' + condition.code + '.gif">';
+						var weath_high = data.query.results.channel.item.forecast[0].high;
+						var daily_code = data.query.results.channel.item.forecast[0].code;
+						var weath_low = data.query.results.channel.item.forecast[0].low;
+						var weath_img_d = '<img src="http://l.yimg.com/a/i/us/we/52/' + daily_code + '.gif">';
+						var e_code = parseInt(daily_code);
+						
+						if (e_code == 28
+							|| e_code == 30
+							|| e_code == 32
+							|| e_code == 34) {
+								e_code = e_code - 1;							
+								
+							}
+						var weath_img_n = '<img src="http://l.yimg.com/a/i/us/we/52/' + e_code + '.gif">';
+							
+						
+						console.log ("weath_high=" + weath_high);
+						var weath = "<div class='city'>" + city + "</div>";
+						weath += "<table><tr><td>";
+						weath += "<span class='info'>" + "NOW  " + "</span>" + "</td></tr>";
+						weath +=  "<tr><td>" + "<span class='temp'>" + weather_temp_C + "</span>";
+						weath += "<sup class='temp_type'>°C</sup>";
+						weath += "</td>";
+						weath += "<td>";
+						weath += weather_image;
+						weath += "</td></tr>"
+						weath += "<tr><td>" + "<span class='info'>" + "DAY" + "</span></td></tr>";
+						weath += "<tr><td>" + "<span class='temp'>" + weath_high + "</span>";
+						weath += "<sup class='temp_type'>°C</sup></td>";
+						weath += "<td>" + weath_img_d + "</td></tr>";
+						weath += "<tr><td>" + "<span class='info'>" + "EVENING" + "</span></td></tr>";
+						weath += "<tr><td>" + "<span class='temp'>" + weath_low + "</span>";
+						weath += "<sup class='temp_type'>°C</sup></td>";
+						weath += "<td>" + weath_img_n;
+						
+						weath += "</tr></table>";
+						document.querySelector('#weather_info').innerHTML = weath;
+						
+						
 					
-						}
-						
-						
-					document.querySelector('#weather_info').innerHTML = weath;
+					}	
 				}
-				
 				
 				req.send();
 				// Every 15 minutes
 				setTimeout(my_weather,15*60*1000);
 				
 			}
+			my_weather();
 		</script>
-		<div id="city">Magnitogorsk
-			<div id="weather_info">
+			<div class="background_on"></div>		
+			<div id="weather_info" align="center">
 			</div>
-		</div>
+		
 		
 		
 	</body>
